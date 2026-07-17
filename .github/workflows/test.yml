@@ -1,0 +1,42 @@
+name: Build and Test Python Project
+on: [push]
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Run tests
+        run: |
+          python -m unittest discover
+      - name: Mock build
+        run: |
+          echo 'Build successful'
+      - name: Deploy
+        run: |
+          echo 'Deploy successful'
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-result
+          path: build-result.txt
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: build-result
+          path: build-result.txt
+
+      - name: Validate build result
+        run: |
+          echo $(cat build-result.txt) == 'Build successful'
+          if [ $? -ne 0 ]; then
+            exit 1
+          fi
